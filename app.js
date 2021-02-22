@@ -4,19 +4,27 @@ let maxAttempts = 25;
 let userAttemptsCounter=0;
 let sectionElement = document.getElementById('product-section');
 
-// let ulElement = document.getElementById('product-list');
 let leftImageIndex ;
 let centerImageIndex ;
 let rightImageIndex;
-// ProductImages.lastShown = [];
+let productNames = [];
+let productClick = [];
+let productShown = [];
+ProductImage.shown = [];
+ let lastShown=[];
+
 
 function ProductImage(name, source) {
     this.name = name;
     this.source = source;
     this.click = 0;
-    this.show=0;
+    this.shown=0;
+    productNames.push(name);
     ProductImage.allImages.push(this);
+    
+    
   }
+  let name ='bayan';
 
   
 ProductImage.allImages = [];
@@ -54,9 +62,6 @@ function generateRandomIndex() {
    }
 
    function renderThreeImages() {
- 
-
-    
     do{
         rightImageIndex=generateRandomIndex();
         leftImageIndex=generateRandomIndex();
@@ -64,22 +69,35 @@ function generateRandomIndex() {
 
 
 
+
        }
-    while (leftImageIndex === rightImageIndex || leftImageElement===centerImageElement || rightImageElement===centerImageElement)
+    while (leftImageIndex === rightImageIndex || leftImageIndex===centerImageIndex || rightImageIndex===centerImageIndex)
 
 
        ProductImage.allImages
-       console.log(ProductImage.allImages[leftImageIndex]);
+      //  console.log(ProductImage.allImages[leftImageIndex]);
      
        leftImageElement.src = ProductImage.allImages[leftImageIndex].source;
+       ProductImage.allImages[leftImageIndex].shown++
        centerImageElement.src = ProductImage.allImages[centerImageIndex].source;
+       ProductImage.allImages[centerImageIndex].shown++
        rightImageElement.src = ProductImage.allImages[rightImageIndex].source;
+       ProductImage.allImages[rightImageIndex].shown++
+
+
+      
 
 
        
        
      }
+    
      renderThreeImages();
+      lastShown.push(leftImageIndex);
+      lastShown.push(centerImageIndex);
+      lastShown.push(rightImageIndex);
+      console.log(lastShown);
+
   
     sectionElement.addEventListener('click',userClick);
     
@@ -94,9 +112,26 @@ function generateRandomIndex() {
               ProductImage.allImages[leftImageIndex].click++
               ProductImage.allImages[centerImageIndex].click++
               ProductImage.allImages[rightImageIndex].click++
-              ProductImage.allImages[leftImageIndex].show++
-              ProductImage.allImages[centerImageIndex].show++
-              ProductImage.allImages[rightImageIndex].show++
+              
+
+              while(leftImageIndex === rightImageIndex || leftImageIndex===centerImageIndex || rightImageIndex===centerImageIndex|| lastShown.includes(leftImageIndex)||lastShown.includes(centerImageIndex) ||lastShown.includes(rightImageIndex)){
+
+                rightImageIndex=generateRandomIndex();
+                leftImageIndex=generateRandomIndex();
+                centerImageIndex = generateRandomIndex();}
+          
+               
+          
+              
+                lastShown=[];
+                lastShown.push(leftImageIndex);
+                lastShown.push(centerImageIndex);
+                lastShown.push(rightImageIndex);
+              
+               ProductImage.allImages
+              
+               console.log ('after',lastShown);
+
 
 
             renderThreeImages();
@@ -121,16 +156,64 @@ function generateRandomIndex() {
 
         display.addEventListener('click',result);
 
+        // function result(event){
+        //   let list=document.getElementById('results-list');
+        //     let productResult;
+        //     for(let i=0;i<ProductImage.allImages.length;i++){
+        //         productResult=document.createElement('li');
+        //       list.appendChild(productResult);
+        //       productResult.textContent = ProductImage.allImages[i].name +  ' had ' + ProductImage.allImages[i].click + ' click'+','+'and was seen'+ProductImage.allImages[i].shown+'times' 
+        //     }
+        //     display.removeEventListener('click',result);
+
+
+        // }
         function result(event){
-          let list=document.getElementById('results-list');
-            let productResult;
-            for(let i=0;i<ProductImage.allImages.length;i++){
-                productResult=document.createElement('li');
-              list.appendChild(productResult);
-              productResult.textContent = ProductImage.allImages[i].name +  ' had ' + ProductImage.allImages[i].click + ' click'+','+'and was seen'+ProductImage.allImages[i].show+'times' 
-            }
-            display.removeEventListener('click',result);
-
-
+        for (let i = 0; i < ProductImage.allImages.length; i++) {
+          productClick.push(ProductImage.allImages[i].click);
+          productShown.push(ProductImage.allImages[i].shown);
         }
+        function viewChart() {
+  
+          let ctx = document.getElementById('myChart').getContext('2d');
+        
+          let chart = new Chart(ctx, {
+            type: 'bar',
+  
+            data: {
+              labels: productNames,
+        
+              datasets: [
+        
+        
+                {
+                  label: 'Product click',
+                  backgroundColor: 'rgb(245, 188, 66)',
+                  borderColor: 'rgb(245, 188, 66)',
+                  data: productClick
+                },
+                
+                {
+                  label: 'Product shown',
+                  backgroundColor: 'rgb(197, 245, 66)',
+                  borderColor: 'rgb(197, 245, 66)',
+                  data: productShown
+                },
+           
+        
+              ]
+            },
+            
+            options: {}
+          });
+  
+        
+        }
+        display.removeEventListener('click',result);
+        viewChart();
+      }
+        
+
+
+
   
